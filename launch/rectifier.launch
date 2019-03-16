@@ -1,0 +1,40 @@
+<launch>
+    <arg name="manager" value="nodelet_manager" />
+    <arg name="respawn" default="true" />
+
+    <arg if="$(arg respawn)" name="bond" value="" />
+    <arg unless="$(arg respawn)" name="bond" value="--no-bond" />
+
+    <!-- Nodelet manager -->
+    <node pkg="nodelet" type="nodelet" name="$(arg manager)" args="manager" output="screen">
+        <param name="num_worker_threads" value="4" />
+    </node>
+
+    <!-- Left camera processing -->
+    <!-- Note that setting up namespaces causes manager to not recognize individual loader -->
+    <!-- so we map the topics instead -->
+    <node pkg="nodelet" type="nodelet" name="left_debayer" args="load image_proc/debayer $(arg manager) $(arg bond)" respawn="$(arg respawn)">
+        <remap from="image_raw"     to="/zed/left/image_raw" />
+        <remap from="image_mono"    to="/zed/left/image_mono" />
+        <remap from="image_color"   to="/zed/left/image_color" />
+    </node>
+    <node pkg="nodelet" type="nodelet" name="left_rectify_mono" args="load image_proc/rectify $(arg manager) $(arg bond)" respawn="$(arg respawn)">
+        <remap from="camera_info"   to="/zed/left/camera_info" />
+        <remap from="image_mono"    to="/zed/left/image_mono" />
+        <remap from="image_rect"    to="/zed/left/image_rect" />
+    </node>
+
+    <!-- Right camera processing -->
+    <node pkg="nodelet" type="nodelet" name="right_debayer" args="load image_proc/debayer $(arg manager) $(arg bond)" respawn="$(arg respawn)">
+        <remap from="image_raw"     to="/zed/right/image_raw" />
+        <remap from="image_mono"    to="/zed/right/image_mono" />
+        <remap from="image_color"   to="/zed/right/image_color" />
+    </node>
+    <node pkg="nodelet" type="nodelet" name="right_rectify_mono" args="load image_proc/rectify $(arg manager) $(arg bond)" respawn="$(arg respawn)">
+        <remap from="camera_info"   to="/zed/right/camera_info" />
+        <remap from="image_mono"    to="/zed/right/image_mono" />
+        <remap from="image_rect"    to="/zed/right/image_rect" />
+    </node>
+
+
+</launch>
