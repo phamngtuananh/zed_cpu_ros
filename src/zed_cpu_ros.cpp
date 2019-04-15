@@ -203,11 +203,11 @@ public:
       // get config from the left, right.yaml in config
       ros::NodeHandle left_nh("left");
       ros::NodeHandle right_nh("right");
-      camera_info_manager::CameraInfoManager left_info_manager(left_nh, "camera/left",
+      camera_info_manager::CameraInfoManager left_info_manager(left_nh, "zed/left",
                                                                "package://zed_cpu_ros/config/left.yaml");
       left_info = left_info_manager.getCameraInfo();
 
-      camera_info_manager::CameraInfoManager right_info_manager(right_nh, "camera/right",
+      camera_info_manager::CameraInfoManager right_info_manager(right_nh, "zed/right",
                                                                 "package://zed_cpu_ros/config/right.yaml");
       right_info = right_info_manager.getCameraInfo();
 
@@ -495,7 +495,7 @@ private:
   std::string config_file_location_;
   std::string encoding_;
 };
-}
+}  // namespace arti
 
 int main(int argc, char** argv)
 {
