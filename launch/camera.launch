@@ -1,26 +1,46 @@
 <launch>
-    <arg name="config_file_location"    default="$(find zed_cpu_ros)/config/SN17454.conf"/>
-    <arg name="camera_namespace"        default="zed"/>
+    <arg name="simulation" default="false" />
+    <arg name="config_file_location" default="$(find zed_cpu_ros)/config/SN17454.conf"/>
+    <arg name="camera_namespace" default="zed"/>
     <!-- to find your device id, use ls /dev/ and look for the numbder after video -->
-    <arg name="device_id"               default="1"/>
-    <arg name="resolution"              default="3"/> <!--0=RESOLUTION_HD2K, 1=RESOLUTION_HD1080, 2=RESOLUTION_HD720, 3=RESOLUTION_VGA -->
-    <arg name="frame_rate"              default="30"/>
-    <arg name="show_image"              default="false"/>
-    <arg name="encoding"                default="bgr8"/>
-    <arg name="use_zed_config"          default="false"/>
-    <arg name="launch_rectifier"        default="true"/>
+    <arg name="device_id" default="1"/>
+    <arg name="resolution" default="3"/>
+    <!--0=RESOLUTION_HD2K, 1=RESOLUTION_HD1080, 2=RESOLUTION_HD720, 3=RESOLUTION_VGA -->
+    <arg name="frame_rate" default="30"/>
+    <arg name="show_image" default="false"/>
+    <arg name="encoding" default="bgr8"/>
+    <arg name="use_zed_config" default="true"/>
 
-    <node pkg="zed_cpu_ros" type="zed_cpu_ros" name="zed_cpu_ros_node" output="screen" ns="$(arg camera_namespace)" required="true">
-    	<param name="resolution"        value="$(arg resolution)" unless="$(eval resolution>3)"/>
-    	<param name="frame_rate"        value="$(arg frame_rate)"/>
-    	<param name="config_file_location" value="$(arg config_file_location)"/>
-    	<param name="show_image"        value="$(arg show_image)"/>
-    	<param name="left_frame_id"     value="zed/left"/>
-    	<param name="right_frame_id"    value="zed/right"/>
-    	<param name="use_zed_config"    value="$(arg use_zed_config)"/>
-    	<param name="device_id"         value="$(arg device_id)"/>
-    	<param name="encoding"          value="$(arg encoding)"/>
+    <!-- Launch image processing nodes -->
+    <arg name="rectify_only" default="true" />
+    <arg name="launch_rectifier" default="$(arg rectify_only)" />
+    <arg name="launch_image_proc" default="$(eval not arg('rectify_only'))" />
+
+    <param name="use_sim_time" value="$(arg simulation)" />
+
+    <!-- Launch camera -->
+    <node unless="$(arg simulation)" pkg="zed_cpu_ros" type="zed_cpu_ros" name="zed_cpu_ros_node" output="screen" ns="$(arg camera_namespace)" required="true">
+        <param name="resolution" value="$(arg resolution)" unless="$(eval resolution>3)"/>
+        <param name="frame_rate" value="$(arg frame_rate)"/>
+        <param name="config_file_location" value="$(arg config_file_location)" if="$(arg use_zed_config)" />
+        <param name="show_image" value="$(arg show_image)"/>
+        <param name="left_frame_id" value="zed_left_camera_optical_frame"/>
+        <param name="right_frame_id" value="zed_right_camera_optical_frame"/>
+        <param name="use_zed_config" value="$(arg use_zed_config)"/>
+        <param name="device_id" value="$(arg device_id)"/>
+        <param name="encoding" value="$(arg encoding)"/>
     </node>
 
-    <include file="$(find zed_cpu_ros)/launch/rectifier.launch" if="$(arg launch_rectifier)"/>
+    <!-- Launch IMU -->
+    <node unless="$(arg simulation)" pkg="myahrs_driver" type="myahrs_driver" name="myahrs_driver" output="screen" required="true">
+        <param name="port" value="/dev/ttyACM0" />
+        <param name="baud_rate" value="115200" />
+        <param name="publish_tf" value="false" />
+    </node>
+
+    <!-- Launch image rectification node if specified -->
+    <include file="$(find zed_cpu_ros)/launch/rectifier.launch" if="$(arg launch_rectifier)" />
+
+    <!-- Launch stereo image matching if specified -->
+    <include file="$(find zed_cpu_ros)/launch/image_proc.launch" if="$(arg launch_image_proc)" />
 </launch>
