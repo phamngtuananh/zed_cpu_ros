@@ -1,0 +1,6 @@
+<launch>
+  <node pkg="myahrs_driver" type="myahrs_driver" name="myahrs_driver">
+    <param name="port" value="/dev/ttyAMC0" />
+    <param name="baud_rate" value="115200" />
+  </node>
+</launch>

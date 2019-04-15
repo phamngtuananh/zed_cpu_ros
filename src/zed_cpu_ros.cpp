@@ -278,15 +278,23 @@ public:
     {
       case 0:
         reso_str = "2K";
+        width_ = 2208;
+        height_ = 1242;
         break;
       case 1:
         reso_str = "FHD";
+        width_ = 1920;
+        height_ = 1080;
         break;
       case 2:
         reso_str = "HD";
+        width_ = 1280;
+        height_ = 720;
         break;
       case 3:
         reso_str = "VGA";
+        width_ = 640;
+        height_ = 376;
         break;
     }
     // left value
