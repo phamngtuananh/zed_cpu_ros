@@ -2,7 +2,7 @@
     <arg name="simulation" default="false" />
     <arg name="config_file_location" default="$(find zed_cpu_ros)/config/SN17454.conf"/>
     <arg name="camera_namespace" default="zed"/>
-    <arg name="device_name" default="/dev/video0"/>
+    <arg name="device_name" default="/dev/ta_zed"/>
     <arg name="resolution" default="3"/>
     <arg name="frame_rate" default="30"/>
     <arg name="show_image" default="false"/>
@@ -30,11 +30,11 @@
     </node>
 
     <!-- Launch IMU -->
-    <!-- <node unless="$(arg simulation)" pkg="myahrs_driver" type="myahrs_driver" name="myahrs_driver" output="screen" required="true">
+    <node unless="$(arg simulation)" pkg="myahrs_driver" type="myahrs_driver" name="myahrs_driver" output="screen" required="true">
         <param name="port" value="/dev/ttyACM0" />
         <param name="baud_rate" value="115200" />
         <param name="publish_tf" value="false" />
-    </node> -->
+    </node>
 
     <!-- Launch image rectification node if specified -->
     <include file="$(find zed_cpu_ros)/launch/rectifier.launch" if="$(arg launch_rectifier)" />

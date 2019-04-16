@@ -1,0 +1,15 @@
+<launch>
+    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se_zed" clear_params="true">
+        <rosparam command="load" file="$(find zed_cpu_ros)/config/ekf_zed.yaml" />
+    </node>
+
+    <node pkg="tf" type="static_transform_publisher" name="imu_to_baselink" 
+          args="-0.00696335 -0.0634209 0.0171533 -0.0109752 -0.0327531 -0.0169462 base_link imu_link 100" />
+
+    <node pkg="hector_trajectory_server" type="hector_trajectory_server" name="trajectory_server" output="screen" ns="base_link">
+        <param name="/target_frame_name" value="odom" />
+        <param name="/source_frame_name" value="base_link" />
+        <param name="/trajectory_update_rate" value="20.0" />
+        <param name="/trajectory_publish_rate" value="20.0" />
+    </node>
+</launch>

@@ -1,3 +1,13 @@
+# ZED ROS Driver for non-CUDA platforms
+Memo:
+```
+roslaunch zed_cpu_ros camera.launch # simulation:=true if playing a bag
+rosrun pl_slam_ros plslam
+roslaunch zed_cpu_ros efk.launch
+
+rviz
+```
+
 zed_cpu_ros
 ===========
 A simple zed camera driver which only use CPU and only publish left and right raw images and its camera info.
