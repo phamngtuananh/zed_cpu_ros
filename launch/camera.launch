@@ -2,12 +2,16 @@
     <arg name="simulation" default="false" />
     <arg name="config_file_location" default="$(find zed_cpu_ros)/config/SN17454.conf"/>
     <arg name="camera_namespace" default="zed"/>
-    <arg name="device_name" default="/dev/ta_zed"/>
     <arg name="resolution" default="3"/>
     <arg name="frame_rate" default="30"/>
     <arg name="show_image" default="false"/>
     <arg name="encoding" default="bgr8"/>
     <arg name="use_zed_config" default="true"/>
+
+    <!-- Path to ports -->
+    <arg name="camera_port" default="/dev/video0"/>
+    <arg name="imu_port" default="/dev/ttyACM1" />
+    <arg name="arduino_port" default="/dev/ttyACM0" />
 
     <!-- Launch image processing nodes -->
     <arg name="rectify_only" default="true" />
@@ -25,16 +29,21 @@
         <param name="left_frame_id" value="zed_left_camera_optical_frame"/>
         <param name="right_frame_id" value="zed_right_camera_optical_frame"/>
         <param name="use_zed_config" value="$(arg use_zed_config)"/>
-        <param name="device_name" value="$(arg device_name)"/>
+        <param name="device_name" value="$(arg camera_port)"/>
         <param name="encoding" value="$(arg encoding)"/>
     </node>
 
     <!-- Launch IMU -->
     <node unless="$(arg simulation)" pkg="myahrs_driver" type="myahrs_driver" name="myahrs_driver" output="screen" required="true">
-        <param name="port" value="/dev/ttyACM0" />
+        <param name="port" value="$(arg imu_port)" />
         <param name="baud_rate" value="115200" />
         <param name="publish_tf" value="false" />
     </node>
+
+    <!-- Launch arduino to control UGV -->
+    <include file="$(find nav_dirn)/launch/driver.launch" unless="$(arg simulation)" >
+        <arg name="arduino_port" value="$(arg arduino_port)" />
+    </include>
 
     <!-- Launch image rectification node if specified -->
     <include file="$(find zed_cpu_ros)/launch/rectifier.launch" if="$(arg launch_rectifier)" />
