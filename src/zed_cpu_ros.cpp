@@ -31,6 +31,7 @@ public:
   StereoCamera(std::string device_name, int resolution, double frame_rate) : frame_rate_(30.0)
   {
     camera_ = new cv::VideoCapture(device_name);
+    assert(camera_->isOpened());
     cv::Mat raw;
     cv::Mat left_image;
     cv::Mat right_image;

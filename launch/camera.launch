@@ -9,7 +9,7 @@
     <arg name="use_zed_config" default="true"/>
 
     <!-- Path to ports -->
-    <arg name="camera_port" default="/dev/video0"/>
+    <arg name="camera_port" default="/dev/ta_zed"/>
     <arg name="imu_port" default="/dev/ttyACM1" />
     <arg name="arduino_port" default="/dev/ttyACM0" />
 
@@ -21,7 +21,7 @@
     <param name="use_sim_time" value="$(arg simulation)" />
 
     <!-- Launch camera -->
-    <node unless="$(arg simulation)" pkg="zed_cpu_ros" type="zed_cpu_ros" name="zed_cpu_ros_node" output="screen" ns="$(arg camera_namespace)" required="true">
+    <node unless="$(arg simulation)" pkg="zed_cpu_ros" type="zed_cpu_ros" name="zed_cpu_ros_node" output="screen" ns="$(arg camera_namespace)" respawn="true">
         <param name="resolution" value="$(arg resolution)" unless="$(eval resolution>3)"/>
         <param name="frame_rate" value="$(arg frame_rate)"/>
         <param name="config_file_location" value="$(arg config_file_location)" if="$(arg use_zed_config)" />
@@ -34,7 +34,7 @@
     </node>
 
     <!-- Launch IMU -->
-    <node unless="$(arg simulation)" pkg="myahrs_driver" type="myahrs_driver" name="myahrs_driver" output="screen" required="true">
+    <node unless="$(arg simulation)" pkg="myahrs_driver" type="myahrs_driver" name="myahrs_driver" output="screen" respawn="true">
         <param name="port" value="$(arg imu_port)" />
         <param name="baud_rate" value="115200" />
         <param name="publish_tf" value="false" />
